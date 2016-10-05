@@ -6,8 +6,7 @@
 # (at your option) any later version.
 #
 # If you find a bug or implement an enhancement, please send a patch
-# to the author in the form of a unified context diff (diff -u) to
-# <b.elliston@unsw.edu.au>.
+# to the author in the form of a unified context diff (diff -u).
 
 """A tool to generate TMY3 or EPW weather data files."""
 
