@@ -9,6 +9,8 @@
 # (at your option) any later version.
 
 """Latitude and longitude support for the BoM solar irradiance grids."""
+import math
+
 
 cellsize = 0.05
 xllcorner = 112.025
@@ -16,14 +18,12 @@ yllcorner = -43.925
 maxcols = 839
 maxrows = 679
 
-import math
 
-
-class LatLong:
+class LatLong(object):
 
     """A point of latitude and logitude."""
 
-    def __init__(self, arg1, arg2, isXY=False):
+    def __init__(self, arg1, arg2, is_xy=False):
         """Initialise a lat/long object.
 
         >>> obj = LatLong(-35, 149)
@@ -38,7 +38,7 @@ class LatLong:
         >>> obj
         (-34.925, 148.975)
         """
-        if isXY:
+        if is_xy:
             if arg1 > maxrows or arg2 > maxcols:
                 raise ValueError
             self.lat = yllcorner + cellsize * (maxrows - arg1)
@@ -76,7 +76,7 @@ class LatLong:
         143.4
         """
         # Code adapted from Chris Veness
-        R = 6371  # km
+        r = 6371  # km
         dlat = math.radians(another.lat - self.lat)
         dlon = math.radians(another.lon - self.lon)
         lat1 = math.radians(self.lat)
@@ -84,7 +84,7 @@ class LatLong:
         a = math.sin(dlat / 2) * math.sin(dlat / 2) + \
             math.sin(dlon / 2) * math.sin(dlon / 2) * math.cos(lat1) * math.cos(lat2)
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return R * c
+        return r * c
 
     def __repr__(self):
         """

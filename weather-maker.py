@@ -16,11 +16,10 @@ import math
 import sys
 import argparse
 import datetime
-from latlong import LatLong
-
 # PyEphem, from http://rhodesmill.org/pyephem/
 # PyEphem provides scientific-grade astronomical computations
 import ephem
+from latlong import LatLong
 
 # From Paul Gilman <Solar.Advisor.Support@nrel.gov>:
 # The first list shows the data columns SAM reads from the weather file:
@@ -39,8 +38,8 @@ import ephem
 # Site elevation
 # Hour of the day
 
-### Sample row from the BoM weather data:
-### hm, 48027,2009,01,01,00,00, 22.3,N, 13.1,N,  3.4,N, 29,N,   7.8,N,  26.9,N,  1.5,N,220,N,  2.1,N,1005.6,N, 975.6,N, 1,#
+# Sample row from the BoM weather data:
+# hm, 48027,2009,01,01,00,00, 22.3,N, 13.1,N,  3.4,N, 29,N,   7.8,N,  26.9,N,  1.5,N,220,N,  2.1,N,1005.6,N, 975.6,N, 1,#
 
 
 def _verbose(s):
