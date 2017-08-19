@@ -176,10 +176,10 @@ def station_details():
     """Read station details file."""
     details = [l for l in open(args.hm_details, 'r') if 'st,' + args.st in l][0]
     # .. st = details[0:2]
-    stNumber = details[3:9].strip().lstrip('0')
-    stName = details[15:55].strip()
-    stState = details[107:110]
-    _verbose('Processing station number %s (%s)' % (stNumber, stName))
+    stnumber = details[3:9].strip().lstrip('0')
+    stname = details[15:55].strip()
+    ststate = details[107:110]
+    _verbose('Processing station number %s (%s)' % (stnumber, stname))
 
     latitude = float(details[72:80])
     longitude = float(details[81:90])
@@ -192,7 +192,7 @@ def station_details():
         _warn('%% wrong = %s, %% suspect = %s, %% inconsistent = %s'
               % (wflags, sflags, iflags))
 
-    return(location, altitude, stNumber, stName, stState)
+    return(location, altitude, stnumber, stname, ststate)
 
 parser = argparse.ArgumentParser(description='Bug reports to: bje@air.net.au')
 parser.add_argument('--version', action='version', version='1.1')
