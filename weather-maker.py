@@ -53,8 +53,8 @@ def _warn(s):
         print >>sys.stderr, s
 
 
-def _verify(items):
-    # Verify that the line is valid.
+def verify(items):
+    """Verify that the line is valid"""
     if items[0] != 'hm':
         _warn('non-hm record')
 
@@ -264,7 +264,7 @@ for inline in infile:
         continue
 
     # Generate pedantic warnings.
-    _verify(data)
+    verify(data)
 
     record = {}
     record['hour'] = i
