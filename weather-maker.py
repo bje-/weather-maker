@@ -247,6 +247,9 @@ for inline in infile:
     if data[2] != str(args.year):
         # Skip years that are not of interest.
         continue
+    if data[11] != '00':
+        # Only look at on-the-hour observations.
+        continue
     if data[3] == '02' and data[4] == '29':
         _warn('skipping Feb 29')
         i += 1
