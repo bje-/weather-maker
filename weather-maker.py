@@ -11,7 +11,6 @@
 """A tool to generate TMY3 or EPW weather data files."""
 
 import os
-import bz2
 import math
 import sys
 import argparse
