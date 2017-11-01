@@ -126,7 +126,7 @@ def irradiances(location, hour):
         # skip Feb 29 on leap years
         hr += datetime.timedelta(days=1)
 
-    filename = hr.strftime(args.grids + '/GHI/%d/' % args.year +
+    filename = hr.strftime(args.grids + '/GHI/%d/' % hr.year +
                            hr.strftime('solar_ghi_%Y%m%d_%HUT.txt'))
     try:
         f = open(filename, 'r')
@@ -137,7 +137,7 @@ def irradiances(location, hour):
         print 'missing', filename
         ghr = 0
 
-    filename = hr.strftime(args.grids + '/DNI/%d/' % args.year +
+    filename = hr.strftime(args.grids + '/DNI/%d/' % hr.year +
                            hr.strftime('solar_dni_%Y%m%d_%HUT.txt'))
     try:
         f = open(filename, 'r')
