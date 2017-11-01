@@ -125,6 +125,7 @@ def irradiances(location, hour):
     if hr.month == 2 and hr.day == 29:
         # skip Feb 29 on leap years
         hr += datetime.timedelta(days=1)
+
     filename = hr.strftime(args.grids + '/HOURLY_GHI/%d/' % args.year +
                            hr.strftime('solar_ghi_%Y%m%d_%HUT.txt'))
     try:
@@ -197,7 +198,7 @@ def station_details():
         _warn('%% wrong = %s, %% suspect = %s, %% inconsistent = %s'
               % (wflags, sflags, iflags))
 
-    return(location, altitude, stnumber, stname, ststate)
+    return location, altitude, stnumber, stname, ststate
 
 
 parser = argparse.ArgumentParser(description='Bug reports to: bje@air.net.au')
