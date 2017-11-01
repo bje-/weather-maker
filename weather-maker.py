@@ -129,36 +129,24 @@ def irradiances(location, hour):
     filename = hr.strftime(args.grids + '/GHI/%d/' % args.year +
                            hr.strftime('solar_ghi_%Y%m%d_%HUT.txt'))
     try:
-        f = bz2.BZ2File(filename + '.bz2', 'r')
+        f = open(filename, 'r')
         line = f.readlines()[x + 6]
         f.close()
         ghr = int(line.split()[y])
     except IOError:
-        try:
-            f = open(filename, 'r')
-            line = f.readlines()[x + 6]
-            f.close()
-            ghr = int(line.split()[y])
-        except IOError:
-            # print 'missing', filename
-            ghr = 0
+        print 'missing', filename
+        ghr = 0
 
     filename = hr.strftime(args.grids + '/DNI/%d/' % args.year +
                            hr.strftime('solar_dni_%Y%m%d_%HUT.txt'))
     try:
-        f = bz2.BZ2File(filename + '.bz2', 'r')
+        f = open(filename, 'r')
         line = f.readlines()[x + 6]
         f.close()
         dnr = int(line.split()[y])
     except IOError:
-        try:
-            f = open(filename, 'r')
-            line = f.readlines()[x + 6]
-            f.close()
-            dnr = int(line.split()[y])
-        except IOError:
-            # print 'missing', filename
-            dnr = 0
+        print 'missing', filename
+        dnr = 0
 
     if ghr == -999:
         ghr = 0
