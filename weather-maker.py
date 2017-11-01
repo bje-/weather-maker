@@ -180,8 +180,8 @@ def irradiances(location, hour):
 
 def station_details():
     """Read station details file."""
-    details = [l for l in open(args.hm_details) if 'st,' + args.st in l][0]
-    # .. st = details[0:2]
+    details = [ln for ln in open(args.hm_details) if 'st,' + args.st in ln][0]
+    # .. st = details[0:3]
     stnumber = details[3:9].strip().lstrip('0')
     stname = details[15:55].strip()
     ststate = details[107:110]
