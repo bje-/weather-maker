@@ -15,6 +15,7 @@ import math
 import sys
 import argparse
 import datetime
+import logging
 # PyEphem, from http://rhodesmill.org/pyephem/
 # PyEphem provides scientific-grade astronomical computations
 import ephem
@@ -36,21 +37,6 @@ from latlong import LatLong
 # Longitude
 # Site elevation
 # Hour of the day
-
-# Sample row from the BoM weather data:
-# hm, 48027,2009,01,01,00,00, 22.3,N, 13.1,N,  3.4,N, 29,N,   7.8,N,  26.9,N,  1.5,N,220,N,  2.1,N,1005.6,N, 975.6,N, 1,#
-
-
-def _verbose(s):
-    if args.verbose:
-        print >>sys.stderr, s
-
-
-def _warn(s):
-    if args.verbose:
-        print >>sys.stderr, 'warning:',
-        print >>sys.stderr, s
-
 
 def verify(items):
     """Verify that the line is valid"""
@@ -160,7 +146,7 @@ def irradiances(location, hour):
     dhr = ghr - dnr * math.cos(zenith)
     if dhr < -10:
         # Don't worry about diffuse levels below 10 W/m2.
-        _warn('negative diffuse horizontal irradiance: %d' % dhr)
+        log.warning('negative diffuse horizontal irradiance: %d', dhr)
         dhr = 0
     return ghr, dnr, dhr
 
@@ -172,7 +158,7 @@ def station_details():
     stnumber = details[3:9].strip().lstrip('0')
     stname = details[15:55].strip()
     ststate = details[107:110]
-    _verbose('Processing station number %s (%s)' % (stnumber, stname))
+    log.info('Processing station number %s (%s)', stnumber, stname)
 
     latitude = float(details[72:80])
     longitude = float(details[81:90])
@@ -182,8 +168,7 @@ def station_details():
     sflags = details[157:160]
     iflags = details[161:164]
     if int(wflags) or int(sflags) or int(iflags):
-        _warn('%% wrong = %s, %% suspect = %s, %% inconsistent = %s'
-              % (wflags, sflags, iflags))
+        log.warning('%% wrong = %s, %% suspect = %s, %% inconsistent = %s', wflags, sflags, iflags)
 
     return location, altitude, stnumber, stname, ststate
 
@@ -210,9 +195,14 @@ parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
                     help="verbose run output")
 args = parser.parse_args()
 
+logging.basicConfig(format='%(levelname)s: %(message)s')
+log = logging.getLogger()
+if args.verbose:
+    log.setLevel(logging.INFO)
+
 # Check that the grid directory exists
 if not os.path.isdir(args.grids):
-    print >>sys.stderr, 'error: %s is not a directory' % args.grids
+    log.critical('%s is not a directory', args.grids)
     sys.exit(1)
 
 infile = open(args.hm_data, 'r')
@@ -226,10 +216,10 @@ observer.lat = str(locn.lat)
 observer.long = str(locn.lon)
 
 if args.format.lower() == 'tmy3':
-    _verbose('Generating a TMY3 file')
+    log.info('Generating a TMY3 file')
     tmy3_preamble(outfile)
 elif args.format.lower() == 'epw':
-    _verbose('Generating an EPW file')
+    log.info('Generating an EPW file')
     epw_preamble(outfile)
 else:
     raise ValueError("unknown format %s" % args.format)
