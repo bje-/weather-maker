@@ -126,7 +126,7 @@ def irradiances(location, hour):
         # skip Feb 29 on leap years
         hr += datetime.timedelta(days=1)
 
-    filename = hr.strftime(args.grids + '/HOURLY_GHI/%d/' % args.year +
+    filename = hr.strftime(args.grids + '/GHI/%d/' % args.year +
                            hr.strftime('solar_ghi_%Y%m%d_%HUT.txt'))
     try:
         f = bz2.BZ2File(filename + '.bz2', 'r')
@@ -143,7 +143,7 @@ def irradiances(location, hour):
             # print 'missing', filename
             ghr = 0
 
-    filename = hr.strftime(args.grids + '/HOURLY_DNI/%d/' % args.year +
+    filename = hr.strftime(args.grids + '/DNI/%d/' % args.year +
                            hr.strftime('solar_dni_%Y%m%d_%HUT.txt'))
     try:
         f = bz2.BZ2File(filename + '.bz2', 'r')
