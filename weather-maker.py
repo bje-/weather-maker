@@ -237,7 +237,7 @@ df = pd.read_csv(args.hm_data, sep=',', skipinitialspace=True, low_memory=False,
 # Reindex the data to hourly
 rng = pd.date_range(pd.datetime(args.year, 1, 1), pd.datetime(args.year, 12, 31, 23),
                     freq='H')
-df = df.reindex(rng, fill_value='NaN')
+df = df.reindex(rng)
 
 # Remove leap year day if present
 df = df[~((df.index.month == 2) & (df.index.day == 29))]
