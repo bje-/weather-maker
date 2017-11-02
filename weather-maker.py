@@ -16,6 +16,8 @@ import sys
 import argparse
 import datetime
 import logging
+import cStringIO
+import itertools
 # PyEphem, from http://rhodesmill.org/pyephem/
 # PyEphem provides scientific-grade astronomical computations
 import ephem
@@ -225,9 +227,14 @@ missing_values = {'Air Temperature in degrees C': 99.9,
                   'Station level pressure in hPa': 999999.}
 
 def _parse(y, m, d, hh, mm):
+    """Parse a multi-column date/time"""
     return pd.datetime(int(y), int(m), int(d), int(hh), int(mm))
 
-df = pd.read_csv(args.hm_data, sep=',', skipinitialspace=True, low_memory=False,
+# Strip MS-DOS end of file characters (^Z) from the file before read_csv sees it.
+with open(args.hm_data, 'rb') as hm:
+    fileio = cStringIO.StringIO(''.join(itertools.ifilter(lambda x: x[0] != '\x1a', hm)))
+
+df = pd.read_csv(fileio, sep=',', skipinitialspace=True, low_memory=False,
                  date_parser=_parse,
                  index_col='datetime',
                  parse_dates={'datetime': ['Year Month Day Hour Minutes in YYYY.1',
