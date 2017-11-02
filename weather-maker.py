@@ -83,8 +83,9 @@ def epw_record(f, rec):
     t = datetime.datetime(args.year, 1, 1)
     t += datetime.timedelta(hours=rec['hour'])
 
-    text = '%d,%d,%d,%d,50,_______________________________________,%.1f,%.1f,%d,%d,9999,9999,9999,%d,%d,%d,999999,999999,999999,999999,%d,%.1f,99,99,9999,99999,9,999999999,99999,0.999,999,99,999,0,99' \
-        % (t.year, t.month, t.day, t.hour + 1, rec['dry-bulb'],
+    text = '%d,%d,%d,%d,50,%s,%.1f,%.1f,%d,%d,9999,9999,9999,%d,%d,%d,999999,999999,999999,999999,%d,%.1f,99,99,9999,99999,9,999999999,99999,0.999,999,99,999,0,99' \
+        % (t.year, t.month, t.day, t.hour + 1, '_' * 39,
+           rec['dry-bulb'],
            rec['dew-point'], rec['rel-humidity'], rec['atm-pressure'],
            rec['ghi'], rec['dni'], rec['dhi'], rec['wind-direction'],
            rec['wind-speed'])
