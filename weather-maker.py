@@ -19,6 +19,7 @@ import logging
 # PyEphem, from http://rhodesmill.org/pyephem/
 # PyEphem provides scientific-grade astronomical computations
 import ephem
+import pandas as pd
 from latlong import LatLong
 
 # From Paul Gilman <Solar.Advisor.Support@nrel.gov>:
@@ -37,15 +38,6 @@ from latlong import LatLong
 # Longitude
 # Site elevation
 # Hour of the day
-
-def verify(items):
-    """Verify that the line is valid"""
-    if items[0] != 'hm':
-        _warn('non-hm record')
-
-    st = items[1].strip().lstrip('0')
-    if st != stnumber:
-        print '%s is a foreign station number' % st
 
 
 def tmy3_preamble(f):
@@ -205,7 +197,6 @@ if not os.path.isdir(args.grids):
     log.critical('%s is not a directory', args.grids)
     sys.exit(1)
 
-infile = open(args.hm_data, 'r')
 outfile = open(args.out, 'wb')
 
 locn, elevation, stnumber, stname, ststate = station_details()
@@ -224,67 +215,50 @@ elif args.format.lower() == 'epw':
 else:
     raise ValueError("unknown format %s" % args.format)
 
-i = 0
-for inline in infile:
-    if len(inline) == 1:
-        # Skip weird ^Z lines.
-        continue
-    data = inline.split(',')
-    if data[1] == 'Station Number':
-        # Skip this line; it is the header.
-        continue
-    if data[2] != str(args.year):
-        # Skip years that are not of interest.
-        continue
-    if data[11] != '00':
-        # Only look at on-the-hour observations.
-        continue
-    if data[3] == '02' and data[4] == '29':
-        _warn('skipping Feb 29')
-        i += 1
-        continue
+missing_values = {'Air Temperature in degrees C': 99.9,
+                  'Wet bulb temperature in degrees C': 99.9,
+                  'Dew point temperature in degrees C': 99.9,
+                  'Relative humidity in percentage %': 999.,
+                  'Wind speed in km/h': 999.,
+                  'Wind direction in degrees true': 999.,
+                  'Station level pressure in hPa': 999999.}
 
-    # Generate pedantic warnings.
-    verify(data)
+def _parse(y, m, d, hh, mm):
+    return pd.datetime(int(y), int(m), int(d), int(hh), int(mm))
 
+df = pd.read_csv(args.hm_data, sep=',', skipinitialspace=True, low_memory=False,
+                 date_parser=_parse,
+                 index_col='datetime',
+                 parse_dates={'datetime': ['Year Month Day Hour Minutes in YYYY.1',
+                              'MM.1', 'DD.1', 'HH24.1', 'MI format in Local standard time']})
+
+# Reindex the data to hourly
+rng = pd.date_range(pd.datetime(args.year, 1, 1), pd.datetime(args.year, 12, 31, 23),
+                    freq='H')
+df = df.reindex(rng, fill_value='NaN')
+
+# Remove leap year day if present
+df = df[~((df.index.month == 2) & (df.index.day == 29))]
+assert len(df) == 8760
+
+# Handle missing values
+df.fillna(value=missing_values, inplace=True)
+
+log.info("Processing grids")
+for i, (_, row) in enumerate(df.iterrows()):
     record = {}
     record['hour'] = i
-    try:
-        record['dry-bulb'] = float(data[7])
-    except ValueError:
-        record['dry-bulb'] = 99.9
-    try:
-        record['wet-bulb'] = float(data[8])
-    except ValueError:
-        record['wet-bulb'] = 99.9
-    try:
-        record['dew-point'] = float(data[9])
-    except ValueError:
-        record['dew-point'] = 99.9
-    try:
-        record['rel-humidity'] = float(data[10])
-    except ValueError:
-        record['rel-humidity'] = 999.
-    try:
-        record['wind-speed'] = float(data[11])
-    except ValueError:
-        record['wind-speed'] = 999.
-    try:
-        record['wind-direction'] = int(data[12])
-    except ValueError:
-        record['wind-direction'] = 999
-    try:
-        record['atm-pressure'] = int(float(data[15]) * 100)
-    except ValueError:
-        record['atm-pressure'] = 999999.
-
+    record['dry-bulb'] = row['Air Temperature in degrees C']
+    record['wet-bulb'] = row['Wet bulb temperature in degrees C']
+    record['dew-point'] = row['Dew point temperature in degrees C']
+    record['rel-humidity'] = row['Relative humidity in percentage %']
+    record['wind-speed'] = row['Wind speed in km/h']
+    record['wind-direction'] = row['Wind direction in degrees true']
+    record['atm-pressure'] = row['Station level pressure in hPa'] * 100.
     record['ghi'], record['dni'], record['dhi'] = irradiances(locn, i)
-    i += 1
-
     if args.format.lower() == 'tmy3':
         tmy3_record(outfile, record)
     elif args.format.lower() == 'epw':
         epw_record(outfile, record)
 
-infile.close()
 outfile.close()
