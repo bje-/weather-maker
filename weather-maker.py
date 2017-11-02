@@ -119,7 +119,7 @@ def irradiances(location, hour):
         f.close()
         ghr = int(line.split()[y])
     except IOError:
-        print 'missing', filename
+        logging.error('grid file %s missing', filename)
         ghr = 0
 
     filename = hr.strftime(args.grids + '/DNI/%d/' % hr.year +
@@ -130,7 +130,7 @@ def irradiances(location, hour):
         f.close()
         dnr = int(line.split()[y])
     except IOError:
-        print 'missing', filename
+        logging.error('grid file %s missing', filename)
         dnr = 0
 
     if ghr == -999:
