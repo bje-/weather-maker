@@ -230,8 +230,8 @@ def _parse(y, m, d, hh, mm):
 df = pd.read_csv(args.hm_data, sep=',', skipinitialspace=True, low_memory=False,
                  date_parser=_parse,
                  index_col='datetime',
-                 parse_dates={'datetime': ['Year Month Day Hour Minutes in YYYY',
-                                           'MM', 'DD', 'HH24',
+                 parse_dates={'datetime': ['Year Month Day Hour Minutes in YYYY.1',
+                                           'MM.1', 'DD.1', 'HH24.1',
                                            'MI format in Local standard time']})
 
 # Reindex the data to hourly
