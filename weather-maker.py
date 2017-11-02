@@ -96,7 +96,6 @@ def irradiances(location, hour):
     """Return the GHI and DNI for a given location and time."""
     x, y = location.xy()
     # Compute a solar data filename from the hour
-    # Use 2010 as the reference year, as it was not a leap year.
     hours = datetime.timedelta(hours=hour)
     tzoffset = datetime.timedelta(hours=args.tz)
     hr = datetime.datetime(args.year, 1, 1) + hours - tzoffset
