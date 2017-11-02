@@ -254,7 +254,7 @@ for i, (_, row) in enumerate(df.iterrows()):
     record['wet-bulb'] = row['Wet bulb temperature in degrees C']
     record['dew-point'] = row['Dew point temperature in degrees C']
     record['rel-humidity'] = row['Relative humidity in percentage %']
-    record['wind-speed'] = row['Wind speed in km/h']
+    record['wind-speed'] = row['Wind speed in km/h'] / 3.6
     record['wind-direction'] = row['Wind direction in degrees true']
     record['atm-pressure'] = row['Station level pressure in hPa'] * 100.
     record['ghi'], record['dni'], record['dhi'] = irradiances(locn, i)
