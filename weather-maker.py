@@ -224,8 +224,10 @@ missing_values = {'Air Temperature in degrees C': 99.9,
                   'Wind direction in degrees true': 999.,
                   'Station level pressure in hPa': 999999.}
 
+
 def _parse(y, m, d, hh, mm):
     return pd.datetime(int(y), int(m), int(d), int(hh), int(mm))
+
 
 df = pd.read_csv(args.hm_data, sep=',', skipinitialspace=True, low_memory=False,
                  date_parser=_parse,
