@@ -147,7 +147,7 @@ def station_details():
     """Read station details file."""
     details = [ln for ln in open(args.hm_details) if 'st,' + args.st in ln][0]
     # .. st = details[0:3]
-    stnumber = details[3:9].strip().lstrip('0')
+    stnumber = details[3:9].strip()
     stname = details[15:55].strip()
     ststate = details[107:110]
     log.info('Processing station number %s (%s)', stnumber, stname)
