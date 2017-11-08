@@ -22,23 +22,6 @@ import ephem
 import pandas as pd
 from latlong import LatLong
 
-# From Paul Gilman <Solar.Advisor.Support@nrel.gov>:
-# The first list shows the data columns SAM reads from the weather file:
-
-# Dry bulb temperature
-# Dew point temperature
-# Wet bulb temperature
-# Percent relative humidity
-# Wind velocity
-# Wind direction
-# Atmospheric pressure
-# Global horizontal radiation (not interpolated)
-# Direct normal radiation (not interpolated)
-# Latitude
-# Longitude
-# Site elevation
-# Hour of the day
-
 
 def tmy3_preamble(f):
     """Emit the required headers for a TMY3 file.
