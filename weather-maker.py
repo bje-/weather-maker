@@ -53,8 +53,8 @@ def tmy3_preamble(f):
 
 def epw_preamble(f):
     """Emit the required headers for an EPW file."""
-    print >>f, 'LOCATION,%s (%s) in %s,%s,AUS,BoM,%s,%.2f,%.2f,%.1f,%.1f' % \
-        (stname, stnumber, args.year, ststate, stnumber, locn.lat, locn.lon,
+    print >>f, 'LOCATION,%s in %s,%s,AUS,BoM,%s,%.2f,%.2f,%.1f,%.1f' % \
+        (stname, args.year, ststate, stnumber, locn.lat, locn.lon,
          args.tz, elevation)
 
     print >>f, 'DESIGN CONDITIONS,0'
