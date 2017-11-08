@@ -70,6 +70,9 @@ def tmy3_record(f, rec):
     """Emit a record in TMY3 format."""
     t = datetime.datetime(args.year, 1, 1)
     t += datetime.timedelta(hours=rec['hour'])
+    if t.month == 2 and t.day == 29:
+        # Skip leap day
+        return
 
     text = '%02d/%02d/%d,%02d:50,-9900,-9900,%d,1,5,%d,1,5,-9900,1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,?,9,-9900,?,9,%.1f,A,7,%.1f,A,7,%.1f,A,7,%d,A,7,%d,A,7,%.1f,A,7,-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,-9900,?,9' \
         % (t.month, t.day, t.year, t.hour + 1, rec['ghi'], rec['dni'],
@@ -82,6 +85,9 @@ def epw_record(f, rec):
     """Emit a record in EPW format."""
     t = datetime.datetime(args.year, 1, 1)
     t += datetime.timedelta(hours=rec['hour'])
+    if t.month == 2 and t.day == 29:
+        # Skip leap day
+        return
 
     text = '%d,%d,%d,%d,50,%s,%.1f,%.1f,%d,%d,9999,9999,9999,%d,%d,%d,999999,999999,999999,999999,%d,%.1f,99,99,9999,99999,9,999999999,99999,0.999,999,99,999,0,99' \
         % (t.year, t.month, t.day, t.hour + 1, '_' * 39,
@@ -99,9 +105,6 @@ def irradiances(location, hour):
     hours = datetime.timedelta(hours=hour)
     tzoffset = datetime.timedelta(hours=args.tz)
     hr = datetime.datetime(args.year, 1, 1) + hours - tzoffset
-    if hr.month == 2 and hr.day == 29:
-        # skip Feb 29 on leap years
-        hr += datetime.timedelta(days=1)
 
     filename = hr.strftime(args.grids + '/GHI/%d/' % hr.year +
                            hr.strftime('solar_ghi_%Y%m%d_%HUT.txt'))
@@ -241,9 +244,8 @@ rng = pd.date_range(pd.datetime(args.year, 1, 1), pd.datetime(args.year, 12, 31,
                     freq='H')
 df = df.reindex(rng)
 
-# Remove leap year day if present
-df = df[~((df.index.month == 2) & (df.index.day == 29))]
-assert len(df) == 8760
+# Basic integrity check on the dataframe
+assert len(df) == 8784 if args.year % 4 == 0 else 8760
 
 # Handle missing values
 df.fillna(value=missing_values, inplace=True)
