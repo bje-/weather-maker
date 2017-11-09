@@ -155,10 +155,13 @@ parser = argparse.ArgumentParser(description='Bug reports to: bje@air.net.au')
 parser.add_argument('--version', action='version', version='1.1')
 parser.add_argument("--grids", type=str, help='top of gridded data tree',
                     required=True)
+parser.add_argument("-l", "--latlong", type=float, nargs=2,
+                    help='latitude and longitude of location')
 parser.add_argument("-y", "--year", type=int, help='year to generate',
                     required=True)
-parser.add_argument("--st", type=str, help='BoM station code (required)',
+parser.add_argument("--st", type=str, help='nearest BoM station code (required)',
                     required=True)
+parser.add_argument("--name", type=str, help='Override station name')
 parser.add_argument("--hm-data", type=str, help='BoM station data file',
                     required=True)
 parser.add_argument("--hm-details", type=str, help='BoM station details file',
@@ -186,6 +189,14 @@ if not os.path.isdir(args.grids):
 outfile = open(args.out, 'wb')
 
 locn, elevation, stnumber, stname, ststate = station_details()
+
+# User overrides
+if args.latlong is not None:
+    locn = LatLong(*args.latlong)
+    stname = '(%.2f, %.2f)' % tuple(args.latlong)
+if args.name is not None:
+    stname = args.name
+
 sun = ephem.Sun()
 observer = ephem.Observer()
 observer.elevation = elevation
