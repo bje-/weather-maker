@@ -241,6 +241,16 @@ df = df.reindex(rng)
 # Basic integrity check on the dataframe
 assert len(df) == 8784 if args.year % 4 == 0 else 8760
 
+# Count missing values
+subset = df.loc[:, ['Air Temperature in degrees C',
+                    'Wet bulb temperature in degrees C',
+                    'Dew point temperature in degrees C',
+                    'Relative humidity in percentage %',
+                    'Wind speed in km/h', 'Wind direction in degrees true',
+                    'Station level pressure in hPa']]
+if subset.isnull().sum().sum() > 0:
+    log.warning('missing values in weather data:\n%s', subset.isnull().sum())
+
 # Handle missing values
 df.fillna(value=missing_values, inplace=True)
 
