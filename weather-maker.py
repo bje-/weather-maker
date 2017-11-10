@@ -263,12 +263,9 @@ for i, (_, row) in enumerate(df.iterrows()):
     record['wet-bulb'] = row['Wet bulb temperature in degrees C']
     record['dew-point'] = row['Dew point temperature in degrees C']
     record['rel-humidity'] = row['Relative humidity in percentage %']
-    try:
-        record['wind-speed'] = row['Wind speed in m/s']
-    except KeyError:
-        record['wind-speed'] = row['Wind speed in km/h']
-        if record['wind-speed'] != 999:
-            record['wind-speed'] /= 3.6
+    record['wind-speed'] = row['Wind speed in km/h']
+    if record['wind-speed'] != 999:
+        record['wind-speed'] /= 3.6
 
     record['wind-direction'] = row['Wind direction in degrees true']
     record['atm-pressure'] = row['Station level pressure in hPa']
