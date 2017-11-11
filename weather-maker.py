@@ -1,4 +1,4 @@
-# Copyright (C) 2011, 2013 Ben Elliston
+# Copyright (C) 2011, 2013, 2017 Ben Elliston
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -83,9 +83,11 @@ def epw_record(f, rec):
     print >>f, text
 
 
-def compute_dhr(hr):
-    # Compute direct horizontal irradiance:
-    # DHI = GHI - DNI cos (zenith)
+def compute_dhi(hr, ghr, dnr):
+    """
+    Compute direct horizontal irradiance:
+    DHI = GHI - DNI cos (zenith)
+    """
     observer.date = hr + datetime.timedelta(minutes=50)
     sun.compute(observer)
     zenith = (math.pi / 2.) - sun.alt
@@ -94,9 +96,10 @@ def compute_dhr(hr):
         # Don't worry about diffuse levels below 10 W/m2.
         log.warning('negative diffuse horizontal irradiance: %d', dhr)
         dhr = 0
+    return dhr
 
 
-def http_irradiances(location, hour):
+def http_irradiances(hour, location):
     """Return the GHI and DNI for a given location and time via AREMI."""
 
     global dni_trace
@@ -117,23 +120,15 @@ def http_irradiances(location, hour):
                                 parse_dates=True, index_col='UTC time', na_values='-')
         ghi_trace.fillna(0, inplace=True)
 
-    # Compute a solar timestamp from the hour
-    hours = datetime.timedelta(hours=hour)
-    tzoffset = datetime.timedelta(hours=args.tz)
-    hr = datetime.datetime(args.year, 1, 1) + hours - tzoffset
-
-    ghr = ghi_trace.loc[hr, 'Value']
-    dnr = dni_trace.loc[hr, 'Value']
-    return ghr, dnr, compute_dhr(hr)
+    ghr = ghi_trace.loc[hour, 'Value']
+    dnr = dni_trace.loc[hour, 'Value']
+    return ghr, dnr
 
 
-def disk_irradiances(location, hour):
+def disk_irradiances(hr, location):
     """Return the GHI and DNI for a given location and time."""
     x, y = location.xy()
     # Compute a solar data filename from the hour
-    hours = datetime.timedelta(hours=hour)
-    tzoffset = datetime.timedelta(hours=args.tz)
-    hr = datetime.datetime(args.year, 1, 1) + hours - tzoffset
 
     filename = hr.strftime(args.grids + '/GHI/%d/' % hr.year +
                            hr.strftime('solar_ghi_%Y%m%d_%HUT.txt'))
@@ -161,7 +156,7 @@ def disk_irradiances(location, hour):
         ghr = 0
     if dnr == -999:
         dnr = 0
-    return ghr, dnr, compute_dhr(hr)
+    return ghr, dnr
 
 
 def station_details():
@@ -291,6 +286,11 @@ df.fillna(value=missing_values, inplace=True)
 log.info("Processing grids")
 
 for i, (_, row) in enumerate(df.iterrows()):
+
+    offset = datetime.timedelta(hours=i)
+    tzoffset = datetime.timedelta(hours=args.tz)
+    hr = datetime.datetime(args.year, 1, 1) + offset - tzoffset
+
     record = {}
     record['hour'] = i
     record['dry-bulb'] = row['Air Temperature in degrees C']
@@ -307,9 +307,13 @@ for i, (_, row) in enumerate(df.iterrows()):
         record['atm-pressure'] *= 100.
 
     if args.grids is not None:
-        record['ghi'], record['dni'], record['dhi'] = disk_irradiances(locn, i)
+        ghi, dni = disk_irradiances(hr, locn)
     else:
-        record['ghi'], record['dni'], record['dhi'] = http_irradiances(locn, i)
+        ghi, dni = http_irradiances(hr, locn)
+
+    record['ghi'] = ghi
+    record['dni'] = dni
+    record['dhi'] = compute_dhi(hr, ghi, dni)
 
     if args.format.lower() == 'tmy3':
         tmy3_record(outfile, record)
