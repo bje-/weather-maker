@@ -16,11 +16,13 @@ import sys
 import argparse
 import datetime
 import logging
-# PyEphem, from http://rhodesmill.org/pyephem/
+import urllib
 # PyEphem provides scientific-grade astronomical computations
 import ephem
 import pandas as pd
 from latlong import LatLong
+
+ghi_trace, dni_trace = None, None
 
 
 def tmy3_preamble(f):
@@ -81,7 +83,51 @@ def epw_record(f, rec):
     print >>f, text
 
 
-def irradiances(location, hour):
+def compute_dhr(hr):
+    # Compute direct horizontal irradiance:
+    # DHI = GHI - DNI cos (zenith)
+    observer.date = hr + datetime.timedelta(minutes=50)
+    sun.compute(observer)
+    zenith = (math.pi / 2.) - sun.alt
+    dhr = ghr - dnr * math.cos(zenith)
+    if dhr < -10:
+        # Don't worry about diffuse levels below 10 W/m2.
+        log.warning('negative diffuse horizontal irradiance: %d', dhr)
+        dhr = 0
+
+
+def http_irradiances(location, hour):
+    """Return the GHI and DNI for a given location and time via AREMI."""
+
+    global dni_trace
+    global ghi_trace
+    params = {'start': '%d-01-01T00:00:00+%02d00' % (args.year, args.tz),
+              'end': '%d-01-01T00:00:00+%02d00' % (args.year + 1, args.tz)}
+    prefix = 'http://services.aremi.data61.io/solar-satellite/v1'
+
+    if dni_trace is None:
+        dni_trace = pd.read_csv('%s/DNI/%s/%s?%s' %
+                                (prefix, location.lat, location.lon, urllib.urlencode(params)),
+                                parse_dates=True, index_col='UTC time', na_values='-')
+        dni_trace.fillna(0, inplace=True)
+
+    if ghi_trace is None:
+        ghi_trace = pd.read_csv('%s/GHI/%s/%s?%s' %
+                                (prefix, location.lat, location.lon, urllib.urlencode(params)),
+                                parse_dates=True, index_col='UTC time', na_values='-')
+        ghi_trace.fillna(0, inplace=True)
+
+    # Compute a solar timestamp from the hour
+    hours = datetime.timedelta(hours=hour)
+    tzoffset = datetime.timedelta(hours=args.tz)
+    hr = datetime.datetime(args.year, 1, 1) + hours - tzoffset
+
+    ghr = ghi_trace.loc[hr, 'Value']
+    dnr = dni_trace.loc[hr, 'Value']
+    return ghr, dnr, compute_dhr(hr)
+
+
+def disk_irradiances(location, hour):
     """Return the GHI and DNI for a given location and time."""
     x, y = location.xy()
     # Compute a solar data filename from the hour
@@ -115,18 +161,7 @@ def irradiances(location, hour):
         ghr = 0
     if dnr == -999:
         dnr = 0
-
-    # Compute direct horizontal irradiance:
-    # DHI = GHI - DNI cos (zenith)
-    observer.date = hr + datetime.timedelta(minutes=50)
-    sun.compute(observer)
-    zenith = (math.pi / 2.) - sun.alt
-    dhr = ghr - dnr * math.cos(zenith)
-    if dhr < -10:
-        # Don't worry about diffuse levels below 10 W/m2.
-        log.warning('negative diffuse horizontal irradiance: %d', dhr)
-        dhr = 0
-    return ghr, dnr, dhr
+    return ghr, dnr, compute_dhr(hr)
 
 
 def station_details():
@@ -153,8 +188,7 @@ def station_details():
 
 parser = argparse.ArgumentParser(description='Bug reports to: bje@air.net.au')
 parser.add_argument('--version', action='version', version='1.1')
-parser.add_argument("--grids", type=str, help='top of gridded data tree',
-                    required=True)
+parser.add_argument("--grids", type=str, help='top of gridded data tree')
 parser.add_argument("-l", "--latlong", type=float, nargs=2,
                     help='latitude and longitude of location')
 parser.add_argument("-y", "--year", type=int, help='year to generate',
@@ -182,7 +216,7 @@ if args.verbose:
     log.setLevel(logging.INFO)
 
 # Check that the grid directory exists
-if not os.path.isdir(args.grids):
+if args.grids is not None and not os.path.isdir(args.grids):
     log.critical('%s is not a directory', args.grids)
     sys.exit(1)
 
@@ -271,7 +305,12 @@ for i, (_, row) in enumerate(df.iterrows()):
     record['atm-pressure'] = row['Station level pressure in hPa']
     if record['atm-pressure'] != 999999:
         record['atm-pressure'] *= 100.
-    record['ghi'], record['dni'], record['dhi'] = irradiances(locn, i)
+
+    if args.grids is not None:
+        record['ghi'], record['dni'], record['dhi'] = disk_irradiances(locn, i)
+    else:
+        record['ghi'], record['dni'], record['dhi'] = http_irradiances(locn, i)
+
     if args.format.lower() == 'tmy3':
         tmy3_record(outfile, record)
     elif args.format.lower() == 'epw':
