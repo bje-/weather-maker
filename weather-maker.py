@@ -20,6 +20,7 @@ import urllib
 # PyEphem provides scientific-grade astronomical computations
 import ephem
 import pandas as pd
+
 from latlong import LatLong
 
 ghi_trace, dni_trace = None, None
@@ -102,8 +103,8 @@ def compute_dhi(hr, ghr, dnr):
 def http_irradiances(hour, location):
     """Return the GHI and DNI for a given location and time via AREMI."""
 
-    global dni_trace
-    global ghi_trace
+    global dni_trace, ghi_trace
+
     params = {'start': '%d-01-01T00:00:00+%02d00' % (args.year, args.tz),
               'end': '%d-01-01T00:00:00+%02d00' % (args.year + 1, args.tz)}
     prefix = 'http://services.aremi.data61.io/solar-satellite/v1'
@@ -112,12 +113,18 @@ def http_irradiances(hour, location):
         dni_trace = pd.read_csv('%s/DNI/%s/%s?%s' %
                                 (prefix, location.lat, location.lon, urllib.urlencode(params)),
                                 parse_dates=True, index_col='UTC time', na_values='-')
+        dni_trace.interpolate(inplace=True, limit=2)
+        if dni_trace.isnull().sum().sum() > 0:
+            log.warning('missing values in DNI data: %d', dni_trace.isnull().sum().sum())
         dni_trace.fillna(0, inplace=True)
 
     if ghi_trace is None:
         ghi_trace = pd.read_csv('%s/GHI/%s/%s?%s' %
                                 (prefix, location.lat, location.lon, urllib.urlencode(params)),
                                 parse_dates=True, index_col='UTC time', na_values='-')
+        ghi_trace.interpolate(inplace=True, limit=2)
+        if ghi_trace.isnull().sum().sum() > 0:
+            log.warning('missing values in GHI data: %d', ghi_trace.isnull().sum().sum())
         ghi_trace.fillna(0, inplace=True)
 
     ghr = ghi_trace.loc[hour, 'Value']
