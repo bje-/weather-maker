@@ -95,7 +95,6 @@ def compute_dhi(hr, ghr, dnr):
     dhr = ghr - dnr * math.cos(zenith)
     if dhr < -10:
         # Don't worry about diffuse levels below 10 W/m2.
-        log.warning('negative diffuse horizontal irradiance: %d', dhr)
         dhr = 0
     return dhr
 
@@ -268,6 +267,9 @@ df = pd.read_csv(args.hm_data, sep=',', skipinitialspace=True, low_memory=False,
                  parse_dates={'datetime': ['Year Month Day Hour Minutes in YYYY.1',
                                            'MM.1', 'DD.1', 'HH24.1',
                                            'MI format in Local standard time']})
+
+# Interpolate missing data (limit two consecutive NaNs)
+df.interpolate(inplace=True, limit=2)
 
 # Reindex the data to hourly
 rng = pd.date_range(pd.datetime(args.year, 1, 1), pd.datetime(args.year, 12, 31, 23),
