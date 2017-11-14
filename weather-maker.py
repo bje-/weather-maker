@@ -268,8 +268,8 @@ df = pd.read_csv(args.hm_data, sep=',', skipinitialspace=True, low_memory=False,
                                            'MM.1', 'DD.1', 'HH24.1',
                                            'MI format in Local standard time']})
 
-# Interpolate missing data (limit two consecutive NaNs)
-df.interpolate(inplace=True, limit=2)
+# Interpolate missing data (limit four consecutive NaNs--two hours)
+df.interpolate(inplace=True, limit=4)
 
 # Reindex the data to hourly
 rng = pd.date_range(pd.datetime(args.year, 1, 1), pd.datetime(args.year, 12, 31, 23),
