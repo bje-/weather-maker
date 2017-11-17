@@ -16,7 +16,9 @@ import sys
 import argparse
 import datetime
 import logging
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 # PyEphem provides scientific-grade astronomical computations
 import ephem
 import pandas as pd
@@ -31,17 +33,17 @@ def tmy3_preamble(f):
 
     eg. 722287,"ANNISTON METROPOLITAN AP",AL,-6.0,33.583,-85.850,186
     """
-    print('%s in %s,\"%s\",%s,%.1f,%.3f,%.3f,%d' % \
-        (stnumber, stname, args.year, ststate[0:2], args.tz,
-         locn.lat, locn.lon, elevation), file=f)
+    print('%s in %s,\"%s\",%s,%.1f,%.3f,%.3f,%d' %
+          (stnumber, stname, args.year, ststate[0:2], args.tz,
+           locn.lat, locn.lon, elevation), file=f)
     print('Date (MM/DD/YYYY),Time (HH:MM),ETR (W/m^2),ETRN (W/m^2),GHI (W/m^2),GHI source,GHI uncert (%),DNI (W/m^2),DNI source,DNI uncert (%),DHI (W/m^2),DHI source,DHI uncert (%),GH illum (lx),GH illum source,Global illum uncert (%),DN illum (lx),DN illum source,DN illum uncert (%),DH illum (lx),DH illum source,DH illum uncert (%),Zenith lum (cd/m^2),Zenith lum source,Zenith lum uncert (%),TotCld (tenths),TotCld source,TotCld uncert (code),OpqCld (tenths),OpqCld source,OpqCld uncert (code),Dry-bulb (C),Dry-bulb source,Dry-bulb uncert (code),Dew-point (C),Dew-point source,Dew-point uncert (code),RHum (%),RHum source,RHum uncert (code),Pressure (mbar),Pressure source,Pressure uncert (code),Wdir (degrees),Wdir source,Wdir uncert (code),Wspd (m/s),Wspd source,Wspd uncert (code),Hvis (m),Hvis source,Hvis uncert (code),CeilHgt (m),CeilHgt source,CeilHgt uncert (code),Pwat (cm),Pwat source,Pwat uncert (code),AOD (unitless),AOD source,AOD uncert (code),Alb (unitless),Alb source,Alb uncert (code),Lprecip depth (mm),Lprecip quantity (hr),Lprecip source,Lprecip uncert (code)', file=f)
 
 
 def epw_preamble(f):
     """Emit the required headers for an EPW file."""
-    print('LOCATION,%s in %s,%s,AUS,BoM,%s,%.2f,%.2f,%.1f,%.1f' % \
-        (stname, args.year, ststate, stnumber, locn.lat, locn.lon,
-         args.tz, elevation), file=f)
+    print('LOCATION,%s in %s,%s,AUS,BoM,%s,%.2f,%.2f,%.1f,%.1f' %
+          (stname, args.year, ststate, stnumber, locn.lat, locn.lon,
+           args.tz, elevation), file=f)
 
     print('DESIGN CONDITIONS,0', file=f)
     print('TYPICAL/EXTREME PERIODS,,', file=f)
