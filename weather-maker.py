@@ -221,7 +221,7 @@ if args.grids is not None and not os.path.isdir(args.grids):
     log.critical('%s is not a directory', args.grids)
     sys.exit(1)
 
-outfile = open(args.out, 'wb')
+outfile = open(args.out, 'w')
 
 locn, elevation, stnumber, stname, ststate = station_details()
 
