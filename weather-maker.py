@@ -115,7 +115,7 @@ def http_irradiances(hour, location):
         dni_trace = pd.read_csv('%s/DNI/%s/%s?%s' %
                                 (prefix, location.lat, location.lon, urllib.parse.urlencode(params)),
                                 parse_dates=True, index_col='UTC time', na_values='-')
-        dni_trace.interpolate(inplace=True, limit=2)
+        dni_trace.interpolate(inplace=True, limit=args.i)
         if dni_trace.isnull().sum().sum() > 0:
             log.warning('missing values in DNI data: %d', dni_trace.isnull().sum().sum())
         dni_trace.fillna(0, inplace=True)
@@ -124,7 +124,7 @@ def http_irradiances(hour, location):
         ghi_trace = pd.read_csv('%s/GHI/%s/%s?%s' %
                                 (prefix, location.lat, location.lon, urllib.parse.urlencode(params)),
                                 parse_dates=True, index_col='UTC time', na_values='-')
-        ghi_trace.interpolate(inplace=True, limit=2)
+        ghi_trace.interpolate(inplace=True, limit=args.i)
         if ghi_trace.isnull().sum().sum() > 0:
             log.warning('missing values in GHI data: %d', ghi_trace.isnull().sum().sum())
         ghi_trace.fillna(0, inplace=True)
@@ -195,6 +195,8 @@ parser.add_argument('--version', action='version', version='1.1')
 parser.add_argument("--grids", type=str, help='top of gridded data tree')
 parser.add_argument("-l", "--latlong", type=float, nargs=2,
                     help='latitude and longitude of location')
+parser.add_argument("-i", "--interp-length", type=int, default=2,
+                    help='maximum length of interpolation (hours)')
 parser.add_argument("-y", "--year", type=int, help='year to generate',
                     required=True)
 parser.add_argument("--st", type=str, help='nearest BoM station code (required)',
@@ -272,8 +274,8 @@ df = pd.read_csv(args.hm_data, sep=',', skipinitialspace=True, low_memory=False,
                                            'MM.1', 'DD.1', 'HH24.1',
                                            'MI format in Local standard time']})
 
-# Interpolate missing data (limit four consecutive NaNs--two hours)
-df.interpolate(inplace=True, limit=4)
+# Interpolate missing data (limit to args.i half hours)
+df.interpolate(inplace=True, limit=args.i * 2)
 
 # Reindex the data to hourly
 rng = pd.date_range(pd.datetime(args.year, 1, 1), pd.datetime(args.year, 12, 31, 23),
