@@ -62,10 +62,11 @@ def tmy3_record(f, rec):
         # Skip leap day
         return
 
-    text = '%02d/%02d/%d,%02d:50,-9900,-9900,%d,1,5,%d,1,5,-9900,1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,?,9,-9900,?,9,%.1f,A,7,%.1f,A,7,%.1f,A,7,%d,A,7,%d,A,7,%.1f,A,7,-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,-9900,?,9' \
+    text = '%02d/%02d/%d,%02d:50,-9900,-9900,%d,1,5,%d,1,5,%d,1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,?,9,-9900,?,9,%.1f,A,7,%.1f,A,7,%.1f,A,7,%d,A,7,%d,A,7,%.1f,A,7,-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,-9900,?,9' \
         % (t.month, t.day, t.year, t.hour + 1, rec['ghi'], rec['dni'],
-           rec['dry-bulb'], rec['dew-point'], rec['rel-humidity'],
-           rec['atm-pressure'] / 100, rec['wind-direction'], rec['wind-speed'])
+           rec['dhi'], rec['dry-bulb'], rec['dew-point'],
+           rec['rel-humidity'], rec['atm-pressure'] / 100,
+           rec['wind-direction'], rec['wind-speed'])
     print(text, file=f)
 
 
