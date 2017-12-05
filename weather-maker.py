@@ -95,7 +95,7 @@ def compute_dhi(hr, ghr, dnr):
     sun.compute(observer)
     zenith = (math.pi / 2.) - sun.alt
     dhr = ghr - dnr * math.cos(zenith)
-    if dhr < -10:
+    if dhr < 10:
         # Don't worry about diffuse levels below 10 W/m2.
         dhr = 0
     return dhr
