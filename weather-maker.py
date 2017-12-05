@@ -195,7 +195,7 @@ parser.add_argument('--version', action='version', version='1.1')
 parser.add_argument("--grids", type=str, help='top of gridded data tree')
 parser.add_argument("-l", "--latlong", type=float, nargs=2,
                     help='latitude and longitude of location')
-parser.add_argument("-i", "--interp-length", type=int, default=2,
+parser.add_argument("-i", type=int, default=2,
                     help='maximum length of interpolation (hours)')
 parser.add_argument("-y", "--year", type=int, help='year to generate',
                     required=True)
