@@ -207,7 +207,6 @@ parser.add_argument("--hm-data", type=str, help='BoM station data file',
                     required=True)
 parser.add_argument("--hm-details", type=str, help='BoM station details file',
                     required=True)
-# FIXME: half-hour timezones (eg +9.5) do not work.
 parser.add_argument("--tz", type=float, default=10.0,
                     help='Time zone [default +10]')
 parser.add_argument("-o", "--out", type=str, help='output filename',
@@ -275,7 +274,7 @@ df = pd.read_csv(args.hm_data, sep=',', skipinitialspace=True, low_memory=False,
                                            'MM.1', 'DD.1', 'HH24.1',
                                            'MI format in Local standard time']})
 
-# Interpolate missing data (limit to args.i half hours)
+# Interpolate missing data (limit to args.i hours aka 2*args.i half-hours)
 df.interpolate(inplace=True, limit=args.i * 2)
 
 # Reindex the data to hourly
