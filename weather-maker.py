@@ -107,8 +107,9 @@ def http_irradiances(hour, location):
 
     global dni_trace, ghi_trace
 
-    params = {'start': '%d-01-01T00:00:00+%02d00' % (args.year, args.tz),
-              'end': '%d-01-01T00:00:00+%02d00' % (args.year + 1, args.tz)}
+    tzhour, tzmin = math.modf(args.tz)
+    params = {'start': '%d-01-01T00:00:00+%02d%02d' % (args.byear, tzhour, tzmin),
+              'end': '%d-01-01T00:00:00+%02d02d' % (args.year + 1, tzhour, tzmin)}
     prefix = 'http://services.aremi.data61.io/solar-satellite/v1'
 
     if dni_trace is None:
