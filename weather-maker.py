@@ -164,10 +164,6 @@ def disk_irradiances(hr, location):
         logging.error('grid file %s missing', filename)
         dnr = 0
 
-    if ghr == -999:
-        ghr = 0
-    if dnr == -999:
-        dnr = 0
     return ghr, dnr
 
 
