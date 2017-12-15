@@ -121,7 +121,7 @@ def http_irradiances(hour, location):
         dni_trace.interpolate(inplace=True, limit=args.i)
         if dni_trace.isnull().sum().sum() > 0:
             log.warning('missing values in DNI data: %d', dni_trace.isnull().sum().sum())
-        dni_trace.fillna(0, inplace=True)
+        dni_trace.fillna(-999, inplace=True)
 
     if ghi_trace is None:
         ghi_trace = pd.read_csv('%s/GHI/%s/%s?%s' %
@@ -130,7 +130,7 @@ def http_irradiances(hour, location):
         ghi_trace.interpolate(inplace=True, limit=args.i)
         if ghi_trace.isnull().sum().sum() > 0:
             log.warning('missing values in GHI data: %d', ghi_trace.isnull().sum().sum())
-        ghi_trace.fillna(0, inplace=True)
+        ghi_trace.fillna(-999, inplace=True)
 
     ghr = ghi_trace.loc[hour, 'Value']
     dnr = dni_trace.loc[hour, 'Value']
