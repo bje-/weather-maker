@@ -92,6 +92,9 @@ def compute_dhi(hr, ghr, dnr):
     Compute direct horizontal irradiance:
     DHI = GHI - DNI cos (zenith)
     """
+    if dnr == -999 or ghr == -999:
+        return -999
+
     observer.date = hr + datetime.timedelta(minutes=50)
     sun.compute(observer)
     zenith = (math.pi / 2.) - sun.alt
