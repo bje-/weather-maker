@@ -95,7 +95,7 @@ def compute_dhi(hr, ghr, dnr):
     if dnr == -999 or ghr == -999:
         return -999
 
-    observer.date = hr + datetime.timedelta(minutes=50)
+    observer.date = hr + datetime.timedelta(minutes=50)  # pylint: disable=assigning-non-slot
     sun.compute(observer)
     zenith = (math.pi / 2.) - sun.alt
     dhr = ghr - dnr * math.cos(zenith)
@@ -108,7 +108,7 @@ def compute_dhi(hr, ghr, dnr):
 def http_irradiances(hour, location):
     """Return the GHI and DNI for a given location and time via AREMI."""
 
-    global dni_trace, ghi_trace
+    global dni_trace, ghi_trace  # pylint: disable=global-statement
 
     tzmin, tzhour = math.modf(args.tz)
     tzmin *= 60
@@ -241,9 +241,9 @@ if args.name is not None:
 
 sun = ephem.Sun()
 observer = ephem.Observer()
-observer.elevation = elevation
-observer.lat = str(locn.lat)
-observer.long = str(locn.lon)
+observer.elevation = elevation  # pylint: disable=assigning-non-slot
+observer.lat = str(locn.lat)    # pylint: disable=assigning-non-slot
+observer.long = str(locn.lon)   # pylint: disable=assigning-non-slot
 
 if args.format.lower() == 'tmy3':
     log.info('Generating a TMY3 file')
