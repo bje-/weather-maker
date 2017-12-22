@@ -192,7 +192,7 @@ def station_details():
     return location, altitude, stnumber, stname, ststate
 
 
-parser = argparse.ArgumentParser(description='Bug reports to: bje@air.net.au')
+parser = argparse.ArgumentParser(description='Please file bug reports at https://github.com/bje-/weather-maker/issues')
 parser.add_argument('--version', action='version', version='1.1')
 parser.add_argument("--grids", type=str, help='top of gridded data tree')
 parser.add_argument("-l", "--latlong", type=float, nargs=2,
