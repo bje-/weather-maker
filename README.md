@@ -1,9 +1,9 @@
 # weather-maker
 TMY3/EPW weather data file creation tool
 
-This utility takes publicly available Bureau of Meteorology weather
-and solar radiation data and processes it into a TMY3 or EPW format
-file suitable for tools such as SAM and EnergyPlus. In addition, it
+This utility processes publicly available Bureau of Meteorology
+weather and solar radiation data into a TMY3 or EPW format file
+suitable for tools such as SAM and EnergyPlus. In addition, it
 attempts to clean up the data to produce a high quality weather data
 file.
 
