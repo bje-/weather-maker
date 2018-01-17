@@ -7,11 +7,9 @@ file suitable for tools such as SAM and EnergyPlus. In addition, it
 attempts to clean up the data to produce a high quality weather data
 file.
 
-Command line usage:
-
-usage: weather-maker.py [-h] [--version] [--grids GRIDS] [-l LATLONG LATLONG]
+Usage: `weather-maker.py [-h] [--version] [--grids GRIDS] [-l LATLONG LATLONG]
                         [-i I] -y YEAR --st ST [--name NAME] --hm-data HM_DATA
                         --hm-details HM_DETAILS [--tz TZ] -o OUT
-                        [--format FORMAT] [-v]
+                        [--format FORMAT] [-v]`
 
 Please file bug reports at https://github.com/bje-/weather-maker/issues
