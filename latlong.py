@@ -20,7 +20,7 @@ maxcols = 839
 maxrows = 679
 
 
-class LatLong(object):
+class LatLong:
 
     """A point of latitude and logitude."""
 
@@ -36,8 +36,10 @@ class LatLong(object):
           ...
         ValueError
         >>> obj = LatLong (499, 739, True)
-        >>> obj
-        (-34.925, 148.975)
+        >>> round(obj.lat, 3)  # round for test safety
+        -34.925
+        >>> round(obj.lon, 3)  # round for test safety
+        148.975
         """
         if is_xy:
             if arg1 > maxrows or arg2 > maxcols:
@@ -56,8 +58,10 @@ class LatLong(object):
         >>> obj.xy()
         (499, 739)
         >>> obj = LatLong(0, 0, True)
-        >>> obj
-        (-9.975, 112.025)
+        >>> round(obj.lat, 3)  # round for test safety
+        -9.975
+        >>> round(obj.lon, 3)  # round for test safety
+        112.025
         """
         col = int((self.lon - xllcorner) / cellsize)
         assert col < maxcols
@@ -73,7 +77,7 @@ class LatLong(object):
         >>> obj2 = LatLong (-36, 150)
         >>> obj.distance (obj)
         0.0
-        >>> print '%.1f' % obj.distance (obj2)
+        >>> print('%.1f' % obj.distance (obj2))
         143.4
         """
         # Code adapted from Chris Veness
@@ -93,7 +97,7 @@ class LatLong(object):
         Print object representation.
 
         >>> obj = LatLong(-35, 149)
-        >>> print obj
+        >>> print(obj)
         (-35, 149)
         """
         return self.__str__()
