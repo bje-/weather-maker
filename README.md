@@ -12,4 +12,6 @@ Usage: `weather-maker.py [-h] [--version] [--grids GRIDS] [-l LATLONG LATLONG]
                         --hm-details HM_DETAILS [--tz TZ] -o OUT
                         [--format FORMAT] [-v]`
 
+This script now requires Python 3.
+
 Please file bug reports at https://github.com/bje-/weather-maker/issues
