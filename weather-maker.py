@@ -19,9 +19,9 @@ import logging
 import urllib.request
 import urllib.parse
 import urllib.error
+import pandas as pd
 # PyEphem provides scientific-grade astronomical computations
 import ephem
-import pandas as pd
 
 from latlong import LatLong
 
@@ -88,7 +88,7 @@ def epw_record(f, rec):
     print(text, file=f)
 
 
-def compute_dhi(hr, ghr, dnr):
+def compute_dhi(hour, ghr, dnr):
     """
     Compute direct horizontal irradiance:
     DHI = GHI - DNI cos (zenith)
@@ -97,7 +97,7 @@ def compute_dhi(hr, ghr, dnr):
         return -999
 
     # pylint: disable=assigning-non-slot
-    observer.date = hr + datetime.timedelta(minutes=50)
+    observer.date = hour + datetime.timedelta(minutes=50)
     sun.compute(observer)
     zenith = (math.pi / 2.) - sun.alt
     dhr = ghr - dnr * math.cos(zenith)
@@ -152,13 +152,12 @@ def http_irradiances(hour, location):
     return ghr, dnr
 
 
-def disk_irradiances(hr, location):
+def disk_irradiances(hour, location):
     """Return the GHI and DNI for a given location and time."""
     x, y = location.xy()
     # Compute a solar data filename from the hour
 
-    filename = hr.strftime(args.grids + '/GHI/%d/' % hr.year +
-                           hr.strftime('solar_ghi_%Y%m%d_%HUT.txt'))
+    filename = hour.strftime(args.grids + '/GHI/%Y/solar_ghi_%Y%m%d_%HUT.txt')
     try:
         f = open(filename, 'r')
         line = f.readlines()[x + 6]
@@ -168,8 +167,7 @@ def disk_irradiances(hr, location):
         logging.error('grid file %s missing', filename)
         ghr = 0
 
-    filename = hr.strftime(args.grids + '/DNI/%d/' % hr.year +
-                           hr.strftime('solar_dni_%Y%m%d_%HUT.txt'))
+    filename = hour.strftime(args.grids + '/DNI/%Y/solar_dni_%Y%m%d_%HUT.txt')
     try:
         f = open(filename, 'r')
         line = f.readlines()[x + 6]
@@ -186,9 +184,9 @@ def station_details():
     """Read station details file."""
     details = [ln for ln in open(args.hm_details) if 'st,' + args.st in ln][0]
     # .. st = details[0:3]
-    stnumber = details[3:9].strip()
-    stname = details[15:55].strip()
-    ststate = details[107:110]
+    stNumber = details[3:9].strip()
+    stName = details[15:55].strip()
+    stState = details[107:110]
     log.info('Processing station number %s (%s)', stnumber, stname)
 
     latitude = float(details[72:80])
@@ -202,7 +200,7 @@ def station_details():
         log.warning('%% wrong = %s, %% suspect = %s, %% inconsistent = %s',
                     wflags, sflags, iflags)
 
-    return location, altitude, stnumber, stname, ststate
+    return location, altitude, stNumber, stName, stState
 
 
 parser = argparse.ArgumentParser(description='Please file bug reports at https://github.com/bje-/weather-maker/issues')
