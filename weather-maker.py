@@ -204,33 +204,38 @@ def station_details():
     return location, altitude, stNumber, stName, stState
 
 
-parser = argparse.ArgumentParser(description='Please file bug reports at '
-                                 'https://github.com/bje-/weather-maker/')
-parser.add_argument('--version', action='version', version='1.1')
-parser.add_argument("--grids", type=str, help='top of gridded data tree')
-parser.add_argument("-l", "--latlong", type=float, nargs=2,
-                    help='latitude and longitude of location')
-parser.add_argument("-i", type=int, default=2,
-                    help='maximum length of interpolation (hours)')
-parser.add_argument("-y", "--year", type=int, help='year to generate',
-                    required=True)
-parser.add_argument("--st", type=str,
-                    help='nearest BoM station code (required)',
-                    required=True)
-parser.add_argument("--name", type=str, help='Override station name')
-parser.add_argument("--hm-data", type=str, help='BoM station data file',
-                    required=True)
-parser.add_argument("--hm-details", type=str, help='BoM station details file',
-                    required=True)
-parser.add_argument("--tz", type=float, default=10.0,
-                    help='Time zone [default +10]')
-parser.add_argument("-o", "--out", type=str, help='output filename',
-                    required=True)
-parser.add_argument("--format", type=str, default="epw",
-                    help="output format: EPW [default] or TMY3")
-parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
-                    help="verbose run output")
-args = parser.parse_args()
+def process_options():
+    """Process command line options."""
+    parser = argparse.ArgumentParser(description='Please file bug reports at '
+                                     'https://github.com/bje-/weather-maker/')
+    parser.add_argument('--version', action='version', version='1.1')
+    parser.add_argument("--grids", type=str, help='top of gridded data tree')
+    parser.add_argument("-l", "--latlong", type=float, nargs=2,
+                        help='latitude and longitude of location')
+    parser.add_argument("-i", type=int, default=2,
+                        help='maximum length of interpolation (hours)')
+    parser.add_argument("-y", "--year", type=int, help='year to generate',
+                        required=True)
+    parser.add_argument("--st", type=str,
+                        help='nearest BoM station code (required)',
+                        required=True)
+    parser.add_argument("--name", type=str, help='Override station name')
+    parser.add_argument("--hm-data", type=str, help='BoM station data file',
+                        required=True)
+    parser.add_argument("--hm-details", type=str,
+                        help='BoM station details file', required=True)
+    parser.add_argument("--tz", type=float, default=10.0,
+                        help='Time zone [default +10]')
+    parser.add_argument("-o", "--out", type=str, help='output filename',
+                        required=True)
+    parser.add_argument("--format", type=str, default="epw",
+                        help="output format: EPW [default] or TMY3")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
+                        help="verbose run output")
+    return parser.parse_args()
+
+
+args = process_options()
 
 logging.basicConfig(format='%(levelname)s: %(message)s')
 log = logging.getLogger()
