@@ -13,15 +13,14 @@
 import math
 
 
-cellsize = 0.05
-xllcorner = 112.025
-yllcorner = -43.925
-maxcols = 839
-maxrows = 679
+CELLSIZE = 0.05
+XLLCORNER = 112.025
+YLLCORNER = -43.925
+MAXCOLS = 839
+MAXROWS = 679
 
 
 class LatLong:
-
     """A point of latitude and logitude."""
 
     def __init__(self, arg1, arg2, is_xy=False):
@@ -42,10 +41,10 @@ class LatLong:
         148.975
         """
         if is_xy:
-            if arg1 > maxrows or arg2 > maxcols:
+            if arg1 > MAXROWS or arg2 > MAXCOLS:
                 raise ValueError
-            self.lat = yllcorner + cellsize * (maxrows - arg1)
-            self.lon = xllcorner + cellsize * arg2
+            self.lat = YLLCORNER + CELLSIZE * (MAXROWS - arg1)
+            self.lon = XLLCORNER + CELLSIZE * arg2
         else:
             self.lat = arg1
             self.lon = arg2
@@ -63,9 +62,9 @@ class LatLong:
         >>> round(obj.lon, 3)  # round for test safety
         112.025
         """
-        col = int((self.lon - xllcorner) / cellsize)
-        assert col < maxcols
-        row = int(maxrows - ((self.lat - yllcorner) / cellsize)) - 1
+        col = int((self.lon - XLLCORNER) / CELLSIZE)
+        assert col < MAXCOLS
+        row = int(MAXROWS - ((self.lat - YLLCORNER) / CELLSIZE)) - 1
         assert row >= 0
         return row, col
 
