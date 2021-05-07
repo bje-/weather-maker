@@ -110,7 +110,6 @@ def compute_dhi(hour, ghr, dnr):
 
 def http_irradiances(hour, location):
     """Return the GHI and DNI for a given location and time via AREMI."""
-
     global dni_trace, ghi_trace  # pylint: disable=global-statement
 
     tzmin, tzhour = math.modf(args.tz)
@@ -156,13 +155,12 @@ def http_irradiances(hour, location):
 def disk_irradiances(hour, location):
     """Return the GHI and DNI for a given location and time."""
     x, y = location.xy()
-    # Compute a solar data filename from the hour
 
+    # Compute a solar data filename from the hour
     filename = hour.strftime(args.grids + '/GHI/%Y/solar_ghi_%Y%m%d_%HUT.txt')
     try:
-        f = open(filename, 'r')
-        line = f.readlines()[x + 6]
-        f.close()
+        with open(filename, 'r') as filehandle:
+            line = filehandle.readlines()[x + 6]
         ghr = int(line.split()[y])
     except IOError:
         logging.error('grid file %s missing', filename)
@@ -170,9 +168,8 @@ def disk_irradiances(hour, location):
 
     filename = hour.strftime(args.grids + '/DNI/%Y/solar_dni_%Y%m%d_%HUT.txt')
     try:
-        f = open(filename, 'r')
-        line = f.readlines()[x + 6]
-        f.close()
+        with open(filename, 'r') as filehandle:
+            line = filehandle.readlines()[x + 6]
         dnr = int(line.split()[y])
     except IOError:
         logging.error('grid file %s missing', filename)
@@ -185,9 +182,9 @@ def station_details():
     """Read station details file."""
     details = [ln for ln in open(args.hm_details) if 'st,' + args.st in ln][0]
     # .. st = details[0:3]
-    stNumber = details[3:9].strip()
-    stName = details[15:55].strip()
-    stState = details[107:110]
+    st_number = details[3:9].strip()
+    st_name = details[15:55].strip()
+    st_state = details[107:110]
     log.info('Processing station number %s (%s)', stnumber, stname)
 
     latitude = float(details[72:80])
@@ -201,7 +198,7 @@ def station_details():
         log.warning('%% wrong = %s, %% suspect = %s, %% inconsistent = %s',
                     wflags, sflags, iflags)
 
-    return location, altitude, stNumber, stName, stState
+    return location, altitude, st_number, st_name, st_state
 
 
 def process_options():
