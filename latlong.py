@@ -49,12 +49,12 @@ class LatLong:
             self.lat = arg1
             self.lon = arg2
 
-    def xy(self):
+    def cartesian(self):
         """
         Return the Cartesian coordinate.
 
         >>> obj = LatLong(-35, 149)
-        >>> obj.xy()
+        >>> obj.cartesian()
         (499, 739)
         >>> obj = LatLong(0, 0, True)
         >>> round(obj.lat, 3)  # round for test safety
@@ -80,6 +80,7 @@ class LatLong:
         143.4
         """
         # Code adapted from Chris Veness
+        # pylint: disable=invalid-name
         r = 6371  # km
         dlat = math.radians(another.lat - self.lat)
         dlon = math.radians(another.lon - self.lon)
