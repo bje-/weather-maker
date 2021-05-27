@@ -160,14 +160,14 @@ def http_irradiances(hour, location):
 
 def disk_irradiances(hour, location):
     """Return the GHI and DNI for a given location and time."""
-    x, y = location.cartesian()
+    xcoord, ycoord = location.cartesian()
 
     # Compute a solar data filename from the hour
     filename = hour.strftime(args.grids + '/GHI/%Y/solar_ghi_%Y%m%d_%HUT.txt')
     try:
         with open(filename, 'r') as filehandle:
-            line = filehandle.readlines()[x + 6]
-        ghr = int(line.split()[y])
+            line = filehandle.readlines()[xcoord + 6]
+        ghr = int(line.split()[ycoord])
     except IOError:
         logging.error('grid file %s missing', filename)
         ghr = 0
@@ -175,8 +175,8 @@ def disk_irradiances(hour, location):
     filename = hour.strftime(args.grids + '/DNI/%Y/solar_dni_%Y%m%d_%HUT.txt')
     try:
         with open(filename, 'r') as filehandle:
-            line = filehandle.readlines()[x + 6]
-        dnr = int(line.split()[y])
+            line = filehandle.readlines()[xcoord + 6]
+        dnr = int(line.split()[ycoord])
     except IOError:
         logging.error('grid file %s missing', filename)
         dnr = 0
