@@ -10,7 +10,6 @@
 # (at your option) any later version.
 
 """Latitude and longitude support for the BoM solar irradiance grids."""
-import math
 
 
 CELLSIZE = 0.05
