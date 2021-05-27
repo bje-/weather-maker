@@ -68,30 +68,6 @@ class LatLong:
         assert row >= 0
         return row, col
 
-    def distance(self, another):
-        """
-        Compute the distance in kilometres between this position and another.
-
-        >>> obj = LatLong (-35, 149)
-        >>> obj2 = LatLong (-36, 150)
-        >>> obj.distance (obj)
-        0.0
-        >>> print('%.1f' % obj.distance (obj2))
-        143.4
-        """
-        # Code adapted from Chris Veness
-        # pylint: disable=invalid-name
-        r = 6371  # km
-        dlat = math.radians(another.lat - self.lat)
-        dlon = math.radians(another.lon - self.lon)
-        lat1 = math.radians(self.lat)
-        lat2 = math.radians(another.lat)
-        a = math.sin(dlat / 2) * math.sin(dlat / 2) + \
-            math.sin(dlon / 2) * math.sin(dlon / 2) * \
-            math.cos(lat1) * math.cos(lat2)
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return r * c
-
     def __repr__(self):
         """
         Print object representation.
