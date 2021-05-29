@@ -1,6 +1,6 @@
 check:
 	flake8 *.py
-	pylint *.py
+	pylint --disable=R0801 *.py
 	pylama *.py
 	pylava *.py
 	vulture --min-confidence=100 *.py
