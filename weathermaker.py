@@ -16,9 +16,6 @@ import sys
 import argparse
 import datetime
 import logging
-import urllib.request
-import urllib.parse
-import urllib.error
 import pandas as pd
 # PyEphem provides scientific-grade astronomical computations
 import ephem
@@ -47,50 +44,6 @@ def compute_dhi(hour, ghr, dnr):
         # Don't worry about diffuse levels below 10 W/m2.
         dhr = 0
     return dhr
-
-
-def http_irradiances(hour, location):
-    """Return the GHI and DNI for a given location and time via AREMI."""
-    global dni_trace, ghi_trace  # pylint: disable=global-statement
-
-    tzmin, tzhour = math.modf(args.tz)
-    tzmin *= 60
-    assert tzmin in (0, 30)
-    params = {'start': '%d-01-01T00:00:00+%02d%02d' %
-                       (args.year, tzhour, tzmin),
-              'end': '%d-01-01T00:00:00+%02d%02d' %
-                     (args.year + 1, tzhour, tzmin)}
-    prefix = 'http://services.aremi.data61.io/solar-satellite/v1'
-
-    if dni_trace is None:
-        dni_trace = pd.read_csv('%s/DNI/%s/%s?%s' %
-                                (prefix, location.lat, location.lon,
-                                 urllib.parse.urlencode(params)),
-                                parse_dates=True,
-                                index_col='UTC time',
-                                na_values='-')
-        dni_trace.interpolate(inplace=True, limit=args.i)
-        dni_null_count = dni_trace.isnull().sum().sum()
-        if dni_null_count > 0:
-            log.warning('missing values in DNI data: %d', dni_null_count)
-        dni_trace.fillna(-999, inplace=True)
-
-    if ghi_trace is None:
-        ghi_trace = pd.read_csv('%s/GHI/%s/%s?%s' %
-                                (prefix, location.lat, location.lon,
-                                 urllib.parse.urlencode(params)),
-                                parse_dates=True,
-                                index_col='UTC time',
-                                na_values='-')
-        ghi_trace.interpolate(inplace=True, limit=args.i)
-        ghi_null_count = ghi_trace.isnull().sum().sum()
-        if ghi_null_count > 0:
-            log.warning('missing values in GHI data: %d', ghi_null_count)
-        ghi_trace.fillna(-999, inplace=True)
-
-    ghr = ghi_trace.loc[hour, 'Value']
-    dnr = dni_trace.loc[hour, 'Value']
-    return ghr, dnr
 
 
 def disk_irradiances(hour, location):
@@ -162,7 +115,8 @@ def process_options():
     parser = argparse.ArgumentParser(description='Please file bug reports at '
                                      'https://github.com/bje-/weather-maker/')
     parser.add_argument('--version', action='version', version='1.1')
-    parser.add_argument("--grids", type=str, help='top of gridded data tree')
+    parser.add_argument("--grids", type=str, help='top of gridded data tree',
+                        required=True)
     parser.add_argument("-l", "--latlong", type=float, nargs=2,
                         help='latitude and longitude of location')
     parser.add_argument("-i", type=int, default=2,
@@ -200,8 +154,6 @@ if args.grids is not None and not os.path.isdir(args.grids):
     log.critical('%s is not a directory', args.grids)
     sys.exit(1)
 
-outfile = open(args.out, 'w')
-
 station = station_details()
 
 # User overrides
@@ -217,15 +169,6 @@ observer.elevation = station.altitude  # pylint: disable=assigning-non-slot
 observer.lat = str(locn.lat)    # pylint: disable=assigning-non-slot
 observer.long = str(locn.lon)   # pylint: disable=assigning-non-slot
 
-if args.format.lower() == 'tmy3':
-    log.info('Generating a TMY3 file')
-    tmy3.preamble(args, station, outfile)
-elif args.format.lower() == 'epw':
-    log.info('Generating an EPW file')
-    epw.preamble(args, station, outfile)
-else:
-    raise ValueError("unknown format %s" % args.format)
-
 missing_values = {'Air Temperature in degrees C': 99.9,
                   'Wet bulb temperature in degrees C': 99.9,
                   'Dew point temperature in degrees C': 99.9,
@@ -239,6 +182,41 @@ missing_values = {'Air Temperature in degrees C': 99.9,
 def _parse(year, month, date, hour, minute):
     return pd.datetime(int(year), int(month), int(date),
                        int(hour), int(minute))
+
+
+def process_grids():
+    """Process every grid in the DataFrame."""
+    log.info("Processing grids")
+    for i, (_, row) in enumerate(df.iterrows()):
+
+        offset = datetime.timedelta(hours=i)
+        tzoffset = datetime.timedelta(hours=args.tz)
+        hour = datetime.datetime(args.year, 1, 1) + offset - tzoffset
+
+        record = {}
+        record['hour'] = i
+        record['dry-bulb'] = row['Air Temperature in degrees C']
+        record['wet-bulb'] = row['Wet bulb temperature in degrees C']
+        record['dew-point'] = row['Dew point temperature in degrees C']
+        record['rel-humidity'] = row['Relative humidity in percentage %']
+        record['wind-speed'] = row['Wind speed in km/h']
+        if record['wind-speed'] != 999:
+            record['wind-speed'] /= 3.6
+
+        record['wind-direction'] = row['Wind direction in degrees true']
+        record['atm-pressure'] = row['Station level pressure in hPa']
+        if record['atm-pressure'] != 999999:
+            record['atm-pressure'] *= 100.
+
+        ghi, dni = disk_irradiances(hour, locn)
+        record['ghi'] = ghi
+        record['dni'] = dni
+        record['dhi'] = compute_dhi(hour, ghi, dni)
+
+        if args.format.lower() == 'tmy3':
+            tmy3.record(args, outfile, record)
+        elif args.format.lower() == 'epw':
+            epw.record(args, outfile, record)
 
 
 df = pd.read_csv(args.hm_data,
@@ -277,41 +255,13 @@ if subset.isnull().sum().sum() > 0:
 # Handle missing values
 df.fillna(value=missing_values, inplace=True)
 
-log.info("Processing grids")
-
-for i, (_, row) in enumerate(df.iterrows()):
-
-    offset = datetime.timedelta(hours=i)
-    tzoffset = datetime.timedelta(hours=args.tz)
-    hr = datetime.datetime(args.year, 1, 1) + offset - tzoffset
-
-    record = {}
-    record['hour'] = i
-    record['dry-bulb'] = row['Air Temperature in degrees C']
-    record['wet-bulb'] = row['Wet bulb temperature in degrees C']
-    record['dew-point'] = row['Dew point temperature in degrees C']
-    record['rel-humidity'] = row['Relative humidity in percentage %']
-    record['wind-speed'] = row['Wind speed in km/h']
-    if record['wind-speed'] != 999:
-        record['wind-speed'] /= 3.6
-
-    record['wind-direction'] = row['Wind direction in degrees true']
-    record['atm-pressure'] = row['Station level pressure in hPa']
-    if record['atm-pressure'] != 999999:
-        record['atm-pressure'] *= 100.
-
-    if args.grids is not None:
-        ghi, dni = disk_irradiances(hr, locn)
+with open(args.out, 'w') as outfile:
+    if args.format.upper() == 'TMY3':
+        log.info('Generating a TMY3 file')
+        tmy3.preamble(args, station, outfile)
+    elif args.format.upper() == 'EPW':
+        log.info('Generating an EPW file')
+        epw.preamble(args, station, outfile)
     else:
-        ghi, dni = http_irradiances(hr, locn)
-
-    record['ghi'] = ghi
-    record['dni'] = dni
-    record['dhi'] = compute_dhi(hr, ghi, dni)
-
-    if args.format.lower() == 'tmy3':
-        tmy3.record(args, outfile, record)
-    elif args.format.lower() == 'epw':
-        epw.record(args, outfile, record)
-
-outfile.close()
+        raise ValueError("unknown format %s" % args.format)
+    process_grids()
