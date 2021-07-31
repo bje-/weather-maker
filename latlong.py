@@ -20,7 +20,7 @@ MAXROWS = 679
 
 
 class LatLong:
-    """A point of latitude and logitude."""
+    """A point of latitude and longitude."""
 
     def __init__(self, arg1, arg2, is_xy=False):
         """Initialise a lat/long object.
