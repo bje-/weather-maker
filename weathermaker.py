@@ -53,7 +53,7 @@ def disk_irradiances(hour, location):
     # Compute a solar data filename from the hour
     filename = hour.strftime(args.grids + '/GHI/%Y/solar_ghi_%Y%m%d_%HUT.txt')
     try:
-        with open(filename, 'r') as filehandle:
+        with open(filename, 'r', encoding='utf-8') as filehandle:
             line = filehandle.readlines()[xcoord + 6]
         ghr = int(line.split()[ycoord])
     except IOError:
@@ -62,7 +62,7 @@ def disk_irradiances(hour, location):
 
     filename = hour.strftime(args.grids + '/DNI/%Y/solar_dni_%Y%m%d_%HUT.txt')
     try:
-        with open(filename, 'r') as filehandle:
+        with open(filename, 'r', encoding='utf-8') as filehandle:
             line = filehandle.readlines()[xcoord + 6]
         dnr = int(line.split()[ycoord])
     except IOError:
@@ -87,7 +87,8 @@ class Station:
 def station_details():
     """Read station details file."""
     stn = Station()
-    details = [ln for ln in open(args.hm_details) if 'st,' + args.st in ln][0]
+    with open(args.hm_details, 'r', encoding='ascii') as filehandle:
+        details = [ln for ln in filehandle if 'st,' + args.st in ln][0]
     # .. st = details[0:3]
     stn.number = details[3:9].strip()
     stn.name = details[15:55].strip()
@@ -255,7 +256,7 @@ if subset.isnull().sum().sum() > 0:
 # Handle missing values
 df.fillna(value=missing_values, inplace=True)
 
-with open(args.out, 'w') as outfile:
+with open(args.out, 'w', encoding='ascii') as outfile:
     if args.format.upper() == 'TMY3':
         log.info('Generating a TMY3 file')
         tmy3.preamble(args, station, outfile)
