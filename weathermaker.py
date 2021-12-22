@@ -215,9 +215,9 @@ def process_grids():
         record['dhi'] = compute_dhi(hour, ghi, dni)
 
         if args.format.lower() == 'tmy3':
-            tmy3.record(args, outfile, record)
+            tmy3.record(outfile, args, record)
         elif args.format.lower() == 'epw':
-            epw.record(args, outfile, record)
+            epw.record(outfile, args, record)
 
 
 df = pd.read_csv(args.hm_data,
