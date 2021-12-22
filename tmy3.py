@@ -15,11 +15,11 @@ def preamble(filehandle, station, args):
 
     eg. 722287,"ANNISTON METROPOLITAN AP",AL,-6.0,33.583,-85.850,186
     """
-    print('%s in %s,\"%s\",%s,%.1f,%.3f,%.3f,%d' %
-          (station.number, station.name, args.year, station.state[0:2],
-           args.tz,
-           station.location.lat, station.location.lon,
-           station.elevation), file=filehandle)
+    print(f'{station.number}, \"{station.name} in {args.year}\",'
+          f'{station.state[:2]},{args.tz:.1f},'
+          f'{station.location.lat:.3f},{station.location.lon:.3f},'
+          f'{station.elevation}', file=filehandle)
+
     print("""Date (MM/DD/YYYY),Time (HH:MM),ETR (W/m^2),ETRN (W/m^2),
 GHI (W/m^2),GHI source,GHI uncert (%),DNI (W/m^2),DNI source,DNI uncert (%),
 DHI (W/m^2),DHI source,DHI uncert (%),GH illum (lx),GH illum source,
