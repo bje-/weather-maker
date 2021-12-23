@@ -10,7 +10,7 @@
 import datetime
 
 
-def preamble(filehandle, station, args):
+def preamble(filehandle, args, station):
     """Emit the required headers for an EPW file."""
     print(f'LOCATION,{station.name} in {args.year},{station.state},'
           f'AUS,BoM,{station.number},{station.location.lat:.2f},'

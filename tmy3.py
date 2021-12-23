@@ -10,7 +10,7 @@
 import datetime
 
 
-def preamble(filehandle, station, args):
+def preamble(filehandle, args, station):
     """Emit the required headers for a TMY3 file.
 
     eg. 722287,"ANNISTON METROPOLITAN AP",AL,-6.0,33.583,-85.850,186

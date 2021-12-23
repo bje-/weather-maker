@@ -259,10 +259,10 @@ df.fillna(value=missing_values, inplace=True)
 with open(args.out, 'w', encoding='ascii') as outfile:
     if args.format.upper() == 'TMY3':
         log.info('Generating a TMY3 file')
-        tmy3.preamble(args, station, outfile)
+        tmy3.preamble(outfile, args, station)
     elif args.format.upper() == 'EPW':
         log.info('Generating an EPW file')
-        epw.preamble(args, station, outfile)
+        epw.preamble(outfile, args, station)
     else:
         raise ValueError("unknown format %s" % args.format)
     process_grids()
