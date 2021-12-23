@@ -231,7 +231,7 @@ df = pd.read_csv(args.hm_data,
                                'MM.1', 'DD.1', 'HH24.1',
                                'MI format in Local standard time']})
 
-# Interpolate missing data (limit to args.i hours aka 2*args.i half-hours)
+# Interpolate missing data (limit to args.i hours or 2*args.i half-hours)
 df.interpolate(inplace=True, limit=args.i * 2)
 
 # Reindex the data to hourly
