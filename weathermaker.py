@@ -159,7 +159,7 @@ station = station_details()
 
 # User overrides
 if args.latlong is not None:
-    locn = LatLong(*args.latlong)
+    station.location = LatLong(*argss.latlong)
     station.name = '(%.2f, %.2f)' % tuple(args.latlong)
 if args.name is not None:
     station.name = args.name
@@ -167,8 +167,8 @@ if args.name is not None:
 sun = ephem.Sun()
 observer = ephem.Observer()
 observer.elevation = station.altitude  # pylint: disable=assigning-non-slot
-observer.lat = str(locn.lat)    # pylint: disable=assigning-non-slot
-observer.long = str(locn.lon)   # pylint: disable=assigning-non-slot
+observer.lat = str(station.location.lat)    # pylint: disable=assigning-non-slot
+observer.long = str(station.location.lon)   # pylint: disable=assigning-non-slot
 
 missing_values = {'Air Temperature in degrees C': 99.9,
                   'Wet bulb temperature in degrees C': 99.9,
@@ -209,7 +209,7 @@ def process_grids():
         if record['atm-pressure'] != 999999:
             record['atm-pressure'] *= 100.
 
-        ghi, dni = disk_irradiances(hour, locn)
+        ghi, dni = disk_irradiances(hour, station.location)
         record['ghi'] = ghi
         record['dni'] = dni
         record['dhi'] = compute_dhi(hour, ghi, dni)
