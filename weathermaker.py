@@ -159,7 +159,7 @@ station = station_details()
 
 # User overrides
 if args.latlong is not None:
-    station.location = LatLong(*argss.latlong)
+    station.location = LatLong(*args.latlong)
     station.name = '(%.2f, %.2f)' % tuple(args.latlong)
 if args.name is not None:
     station.name = args.name
