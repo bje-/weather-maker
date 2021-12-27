@@ -181,8 +181,9 @@ missing_values = {'Air Temperature in degrees C': 99.9,
 
 
 def _parse(year, month, date, hour, minute):
-    return pd.datetime(int(year), int(month), int(date),
-                       int(hour), int(minute))
+    dt = datetime.datetime(int(year), int(month), int(date),
+                           int(hour), int(minute))
+    return pd.to_datetime(dt)
 
 
 def process_grids():
@@ -235,8 +236,8 @@ df = pd.read_csv(args.hm_data,
 df.interpolate(inplace=True, limit=args.i * 2)
 
 # Reindex the data to hourly
-rng = pd.date_range(pd.datetime(args.year, 1, 1),
-                    pd.datetime(args.year, 12, 31, 23),
+rng = pd.date_range(datetime.datetime(args.year, 1, 1),
+                    datetime.datetime(args.year, 12, 31, 23),
                     freq='H')
 df = df.reindex(rng)
 
