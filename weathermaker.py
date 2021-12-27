@@ -35,7 +35,6 @@ def compute_dhi(hour, ghr, dnr):
     if dnr == -999 or ghr == -999:
         return -999
 
-    # pylint: disable=assigning-non-slot
     observer.date = hour + datetime.timedelta(minutes=50)
     sun.compute(observer)
     zenith = (math.pi / 2.) - sun.alt
@@ -166,9 +165,9 @@ if args.name is not None:
 
 sun = ephem.Sun()
 observer = ephem.Observer()
-observer.elevation = station.altitude  # pylint: disable=assigning-non-slot
-observer.lat = str(station.location.lat)    # pylint: disable=assigning-non-slot
-observer.long = str(station.location.lon)   # pylint: disable=assigning-non-slot
+observer.elevation = station.altitude
+observer.lat = str(station.location.lat)
+observer.long = str(station.location.lon)
 
 missing_values = {'Air Temperature in degrees C': 99.9,
                   'Wet bulb temperature in degrees C': 99.9,
