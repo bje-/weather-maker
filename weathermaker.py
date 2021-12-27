@@ -159,7 +159,7 @@ station = station_details()
 # User overrides
 if args.latlong is not None:
     station.location = LatLong(*args.latlong)
-    station.name = '(%.2f, %.2f)' % tuple(args.latlong)
+    station.name = f'({args.latlong[0]:.2f}, {args.latlong[1]:.2f})'
 if args.name is not None:
     station.name = args.name
 
@@ -264,5 +264,5 @@ with open(args.out, 'w', encoding='ascii') as outfile:
         log.info('Generating an EPW file')
         epw.preamble(outfile, args, station)
     else:
-        raise ValueError("unknown format %s" % args.format)
+        raise ValueError(f'unknown format {args.format}')
     process_grids()
