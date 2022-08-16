@@ -180,9 +180,9 @@ missing_values = {'Air Temperature in degrees C': 99.9,
 
 
 def _parse(year, month, date, hour, minute):
-    dt = datetime.datetime(int(year), int(month), int(date),
-                           int(hour), int(minute))
-    return pd.to_datetime(dt)
+    temp = datetime.datetime(int(year), int(month), int(date),
+                             int(hour), int(minute))
+    return pd.to_datetime(temp)
 
 
 def process_grids():
