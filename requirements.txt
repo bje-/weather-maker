@@ -1,2 +1,5 @@
 ephem
 pandas
+pylint
+flake8
+pydocstyle
