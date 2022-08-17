@@ -48,9 +48,10 @@ def record(filehandle, args, rec):
 
     text = f"{time.month:02}/{time.day:02}/{time.year}," \
         f"{time.hour + 1:02}:50,-9900,-9900,{rec['ghi']},1,5,{rec['dni']}," \
-        f"1,5,{rec['dhi']},1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900," \
-        f"?,9,-9900,?,9,{rec['dry-bulb']:.1f},A,7,{rec['dew-point']:.1f},A,7," \
-        f"{rec['rel-humidity']:.1f},A,7,{rec['atm-pressure'] / 100:.1f}," \
-        f"A,7,{rec['wind-direction']},A,7,{rec['wind-speed']:.1f},A,7," \
-        f"-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,-9900,?,9"
+        f"1,5,{rec['dhi']},1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,1,0," \
+        f"-9900,?,9,-9900,?,9,{rec['dry-bulb']:.1f},A,7," \
+        f"{rec['dew-point']:.1f},A,7,{rec['rel-humidity']:.1f},A,7," \
+        f"{rec['atm-pressure'] / 100:.1f},A,7,{rec['wind-direction']}," \
+        f"A,7,{rec['wind-speed']:.1f},A,7,-9900,?,9,-9900,?,9,-9900,?,9," \
+        f"-9900,?,9,-9900,?,9,-9900,-9900,?,9"
     print(text, file=filehandle)
