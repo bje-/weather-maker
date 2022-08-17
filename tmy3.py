@@ -46,12 +46,11 @@ def record(filehandle, args, rec):
         # Skip leap day
         return
 
-    text = '%02d/%02d/%d,%02d:50,-9900,-9900,%d,1,5,%d,1,5,%d,1,0,-9900,' \
-        '1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,?,9,-9900,?,9,%.1f,A,7,' \
-        '%.1f,A,7,%.1f,A,7,%d,A,7,%d,A,7,%.1f,A,7,-9900,?,9,-9900,?,9,-9900,' \
-        '?,9,-9900,?,9,-9900,?,9,-9900,-9900,?,9' \
-        % (time.month, time.day, time.year, time.hour + 1, rec['ghi'], rec['dni'],  # noqa: E501
-           rec['dhi'], rec['dry-bulb'], rec['dew-point'],
-           rec['rel-humidity'], rec['atm-pressure'] / 100,
-           rec['wind-direction'], rec['wind-speed'])
+    text = f"{time.month:02}/{time.day:02}/{time.year}," \
+        f"{time.hour + 1:02}:50,-9900,-9900,{rec['ghi']},1,5,{rec['dni']}," \
+        f"1,5,{rec['dhi']},1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900,1,0,-9900," \
+        f"?,9,-9900,?,9,{rec['dry-bulb']:.1f},A,7,{rec['dew-point']:.1f},A,7," \
+        f"{rec['rel-humidity']:.1f},A,7,{rec['atm-pressure'] / 100:.1f}," \
+        f"A,7,{rec['wind-direction']},A,7,{rec['wind-speed']:.1f},A,7," \
+        f"-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,?,9,-9900,-9900,?,9"
     print(text, file=filehandle)

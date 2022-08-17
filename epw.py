@@ -37,12 +37,10 @@ def record(filehandle, args, rec):
         # Skip leap day
         return
 
-    text = '%d,%d,%d,%d,50,%s,%.1f,%.1f,%d,%d,9999,9999,9999,%d,%d,%d,' \
-        '999999,999999,999999,999999,%d,%.1f,99,99,9999,99999,9,999999999,' \
-        '99999,0.999,999,99,999,0,99' \
-        % (time.year, time.month, time.day, time.hour + 1, '_' * 39,  # noqa: E501
-           rec['dry-bulb'],
-           rec['dew-point'], rec['rel-humidity'], rec['atm-pressure'],
-           rec['ghi'], rec['dni'], rec['dhi'], rec['wind-direction'],
-           rec['wind-speed'])
+    text = f"{time.year},{time.month},{time.day},{time.hour + 1},50," \
+        f"{' ' * 39},{rec['dry-bulb']:.1f},{rec['dew-point']:.1f}," \
+        f"{rec['rel-humidity']},{rec['atm-pressure']},9999,9999,9999," \
+        f"{rec['ghi']},{rec['dni']},{rec['dhi']},999999,999999,999999," \
+        f"999999,{rec['wind-direction']},{rec['wind-speed']:.1f},99,99," \
+        f"9999,99999,9,999999999,99999,0.999,999,99,999,0,99"
     print(text, file=filehandle)
